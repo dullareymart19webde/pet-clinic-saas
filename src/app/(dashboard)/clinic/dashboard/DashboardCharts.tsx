@@ -14,7 +14,7 @@ export function RevenueChart({ data }: { data: any[] }) {
           <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} tickFormatter={(val) => `$${val}`} />
           <Tooltip 
             contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-            formatter={(value: number) => [`$${value}`, 'Revenue']}
+            formatter={(value: any) => [`$${value}`, 'Revenue']}
           />
           <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} />
         </LineChart>
