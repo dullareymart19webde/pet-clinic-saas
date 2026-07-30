@@ -35,12 +35,24 @@ export default function RegisterPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.message || 'Registration failed');
+        throw new Error(JSON.stringify(data));
       }
 
-      router.push('/login?registered=true');
+      // Automatically sign in the user after registration
+      const signInRes = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (signInRes?.error) {
+        throw new Error(signInRes.error);
+      }
+
+      router.push('/dashboard/owner');
     } catch (err: any) {
-      setError(err.message);
+      console.error(err);
+      setError(err.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
