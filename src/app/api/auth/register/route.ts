@@ -41,9 +41,22 @@ export async function POST(req: Request) {
       { status: 201 }
     );
   } catch (error: any) {
+    const dbUrl = process.env.DATABASE_URL || '';
+    const dbDebug = {
+      length: dbUrl.length,
+      startsWithPostgres: dbUrl.startsWith('postgresql://'),
+      hasOwner: dbUrl.includes('neondb_owner'),
+      hasPooler: dbUrl.includes('-pooler'),
+      hasQuotes: dbUrl.includes('"') || dbUrl.includes("'"),
+      hasSpaces: dbUrl.includes(' '),
+    };
+    
     console.error("Registration error:", error);
     return NextResponse.json(
-      { message: String(error) },
+      { 
+        message: String(error),
+        debug: dbDebug
+      },
       { status: 500 }
     );
   }
