@@ -56,7 +56,7 @@ export default async function ClinicDashboardPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-slate-800">Clinic Dashboard</h1>
-        <p className="text-slate-500">Overview of today's operations and performance.</p>
+        <p className="text-slate-500">Overview of today&apos;s operations and performance.</p>
       </div>
 
       {/* KPI Cards */}

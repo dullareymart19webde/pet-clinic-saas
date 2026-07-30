@@ -50,7 +50,7 @@ export default function RegisterPage() {
         throw new Error(signInRes.error);
       }
 
-      router.push('/dashboard/owner');
+      router.push('/dashboard');
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Something went wrong');

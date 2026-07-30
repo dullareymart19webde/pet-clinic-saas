@@ -54,7 +54,7 @@ export default function LoginPage() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-800 leading-tight mb-4 tracking-tight">
-            Welcome back to your pet's dashboard
+            Welcome back to your pet&apos;s dashboard
           </h1>
           <p className="text-slate-500 mb-10 text-lg leading-relaxed">
             Log in to manage appointments, view medical records, and provide the best professional care for your furry friend!
@@ -100,7 +100,7 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-8 text-sm text-slate-500 font-medium">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/register" className="text-[#FFB000] hover:text-[#e69e00] font-bold transition-colors">
               Create one here
             </Link>

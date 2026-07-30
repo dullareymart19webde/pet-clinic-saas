@@ -46,7 +46,7 @@ export default async function DashboardPage() {
           <div className="p-6">
             {pets.length === 0 ? (
               <div className="text-center py-8 text-slate-500">
-                You haven't added any pets yet.
+                You haven&apos;t added any pets yet.
               </div>
             ) : (
               <ul className="space-y-4">
