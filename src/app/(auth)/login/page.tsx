@@ -111,21 +111,21 @@ export default function LoginPage() {
         <div className="hidden md:block w-[45%] p-4 lg:p-6">
           <div className="w-full h-full bg-[#FF8C73] rounded-[2rem] overflow-hidden relative shadow-inner group">
             {/* Nav links on top of image */}
-            <div className="absolute top-8 left-0 right-0 flex justify-center gap-6 text-white/90 text-sm font-bold z-20 px-4 flex-wrap drop-shadow-md">
+            <div className="absolute top-8 left-0 right-0 flex justify-center gap-3 lg:gap-5 text-white/90 text-xs lg:text-sm font-bold z-20 px-2 drop-shadow-md">
               <button 
-                onClick={() => setShowBooking(true)} 
+                onClick={() => { setShowBooking(true); setShowServices(false); setShowSitters(false); }} 
                 className="cursor-pointer hover:text-white transition-colors"
               >
                 Booking
               </button>
               <button 
-                onClick={() => setShowServices(true)} 
+                onClick={() => { setShowServices(true); setShowBooking(false); setShowSitters(false); }} 
                 className="cursor-pointer hover:text-white transition-colors"
               >
                 Our services
               </button>
               <button 
-                onClick={() => setShowSitters(true)}
+                onClick={() => { setShowSitters(true); setShowBooking(false); setShowServices(false); }}
                 className="cursor-pointer hover:text-white transition-colors"
               >
                 Pet sitters
@@ -135,7 +135,7 @@ export default function LoginPage() {
 
             {/* Custom Booking Modal */}
             {showBooking && (
-              <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md text-slate-800 p-6 rounded-3xl shadow-2xl z-30 w-72 border border-white/40 text-center">
+              <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md text-slate-800 p-6 rounded-3xl shadow-2xl z-30 w-11/12 max-w-[280px] border border-white/40 text-center">
                 <h3 className="font-extrabold text-lg mb-2 text-[#FFB000] uppercase tracking-wider">Book an Appointment</h3>
                 <p className="text-slate-500 text-sm font-medium mb-6">Please create an account or sign in using the form on the left to start booking appointments for your pet!</p>
                 <div className="text-4xl mb-6 animate-bounce">📅</div>
@@ -145,7 +145,7 @@ export default function LoginPage() {
 
             {/* Custom Services Modal */}
             {showServices && (
-              <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md text-slate-800 p-6 rounded-3xl shadow-2xl z-30 w-64 border border-white/40">
+              <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md text-slate-800 p-6 rounded-3xl shadow-2xl z-30 w-11/12 max-w-[280px] border border-white/40">
                 <h3 className="font-extrabold text-lg mb-4 text-[#FFB000] uppercase tracking-wider text-center">Our Services</h3>
                 <ul className="space-y-4 font-bold text-sm text-slate-600">
                   <li className="flex items-center gap-4 bg-slate-50 p-3 rounded-2xl"><span className="text-2xl">🐾</span> Boarding</li>
@@ -159,13 +159,13 @@ export default function LoginPage() {
 
             {/* Custom Sitters Modal */}
             {showSitters && (
-              <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md text-slate-800 p-6 rounded-3xl shadow-2xl z-30 w-72 border border-white/40 text-center">
+              <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md text-slate-800 p-6 rounded-3xl shadow-2xl z-30 w-11/12 max-w-[280px] border border-white/40 text-center">
                 <h3 className="font-extrabold text-lg mb-2 text-[#FFB000] uppercase tracking-wider">Meet the Team</h3>
                 <p className="text-slate-500 text-sm font-medium mb-6">Our professional pet sitters are background-checked and love animals as much as you do!</p>
                 <div className="flex justify-center gap-4 mb-6">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-xl shadow-inner">👨‍𦾱</div>
-                  <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center text-xl shadow-inner">👩‍𦾱</div>
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-xl shadow-inner">👨‍𦾱</div>
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-xl shadow-inner">👨‍⚕️</div>
+                  <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center text-xl shadow-inner">👩‍⚕️</div>
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-xl shadow-inner">👨‍⚕️</div>
                 </div>
                 <button onClick={() => setShowSitters(false)} className="w-full bg-[#A5CD39] hover:bg-[#94bd2d] text-white py-3 rounded-2xl transition-colors font-bold shadow-lg shadow-[#A5CD39]/30">Close</button>
               </div>
