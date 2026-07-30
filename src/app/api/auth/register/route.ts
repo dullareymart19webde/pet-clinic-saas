@@ -43,7 +43,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { message: error?.message || 'Internal server error' },
+      { message: String(error) },
       { status: 500 }
     );
   }
