@@ -13,7 +13,7 @@ export async function GET() {
       const data = doc.data();
       return {
         id: doc.id,
-        name: Dr.  ,
+        name: `Dr. ${data.firstName} ${data.lastName}`,
         email: data.email,
         specialty: data.specialty || 'General Practice',
       };
