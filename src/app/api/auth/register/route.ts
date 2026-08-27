@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       const userRecord = await auth.createUser({
         email,
         password,
-        displayName: \ \,
+        displayName: `${firstName} ${lastName}`,
       });
 
       // Save additional user info in Firestore
