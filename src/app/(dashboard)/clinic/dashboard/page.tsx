@@ -27,7 +27,7 @@ export default async function ClinicDashboardPage() {
   let appointmentsToday = 0;
   let completedAppointments = 0;
 
-  appointmentsSnapshot.forEach((doc) => {
+  appointmentsSnapshot.forEach((doc: any) => {
     const data = doc.data();
     if (data.status === 'COMPLETED') completedAppointments++;
     
