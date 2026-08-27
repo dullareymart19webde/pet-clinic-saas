@@ -11,7 +11,7 @@ export default async function BillingPage() {
   }
 
   const billableSnapshot = await db.collection('appointments').where('status', 'in', ['COMPLETED', 'APPROVED']).orderBy('dateTime', 'desc').get();
-  const billableAppointments = billableSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const billableAppointments = billableSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">

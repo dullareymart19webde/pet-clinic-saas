@@ -12,7 +12,7 @@ export default async function ClinicAppointmentsPage() {
   }
 
   const aptsSnapshot = await db.collection('appointments').orderBy('dateTime', 'asc').get();
-  const appointments = aptsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const appointments = aptsSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">

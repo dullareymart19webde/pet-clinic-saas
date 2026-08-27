@@ -8,10 +8,10 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
   const petsSnapshot = await db.collection('pets').where('ownerId', '==', session?.user.id || '').get();
-  const pets = petsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const pets = petsSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
 
   const appointmentsSnapshot = await db.collection('appointments').where('userId', '==', session?.user.id || '').orderBy('dateTime', 'asc').limit(5).get();
-  const appointments = appointmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((a: any) => a.status !== 'COMPLETED');
+  const appointments = appointmentsSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) })).filter((a: any) => a.status !== 'COMPLETED');
 
   return (
     <div className="space-y-8">

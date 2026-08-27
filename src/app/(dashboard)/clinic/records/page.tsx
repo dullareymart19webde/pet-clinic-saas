@@ -13,7 +13,7 @@ export default async function MedicalRecordsPage() {
   }
 
   const recordsSnapshot = await db.collection('medicalRecords').orderBy('createdAt', 'desc').get();
-  const records = recordsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const records = recordsSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
