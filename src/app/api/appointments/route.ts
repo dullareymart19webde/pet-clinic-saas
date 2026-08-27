@@ -12,6 +12,7 @@ export async function POST(req: Request) {
     const aptRef = await db.collection('appointments').add({
       petId: data.petId,
       serviceId: data.serviceId,
+      vetId: data.vetId,
       dateTime: data.dateTime,
       notes: data.notes,
       userId: session.user.id,

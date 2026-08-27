@@ -13,6 +13,7 @@ export default function RegisterPage() {
     lastName: '',
     email: '',
     password: '',
+    role: 'PET_OWNER',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -137,6 +138,39 @@ export default function RegisterPage() {
                 value={formData.password}
                 onChange={handleChange}
               />
+            </div>
+
+            {/* Account Type Selection */}
+            <div className="pt-2 pb-4">
+              <label className="block text-sm font-bold text-slate-700 mb-3 ml-2">I am registering as a:</label>
+              <div className="flex gap-4">
+                <label className="flex-1">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="PET_OWNER"
+                    checked={formData.role === 'PET_OWNER'}
+                    onChange={handleChange}
+                    className="hidden peer"
+                  />
+                  <div className="p-4 text-center border-2 border-slate-100 rounded-2xl cursor-pointer transition-all peer-checked:border-[#A5CD39] peer-checked:bg-[#A5CD39]/10 peer-checked:text-[#88a92f] text-slate-500 font-bold hover:border-slate-200">
+                    🐾 Pet Owner
+                  </div>
+                </label>
+                <label className="flex-1">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="VET"
+                    checked={formData.role === 'VET'}
+                    onChange={handleChange}
+                    className="hidden peer"
+                  />
+                  <div className="p-4 text-center border-2 border-slate-100 rounded-2xl cursor-pointer transition-all peer-checked:border-[#FFB000] peer-checked:bg-[#FFB000]/10 peer-checked:text-[#e69e00] text-slate-500 font-bold hover:border-slate-200">
+                    🩺 Veterinarian
+                  </div>
+                </label>
+              </div>
             </div>
             
             <div className="pt-2">

@@ -6,10 +6,12 @@ export default function BookAppointmentPage() {
   const router = useRouter();
   const [pets, setPets] = useState([]);
   const [services, setServices] = useState([]);
+  const [vets, setVets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     petId: '',
     serviceId: '',
+    vetId: '',
     dateTime: '',
     notes: ''
   });
@@ -17,12 +19,15 @@ export default function BookAppointmentPage() {
   useEffect(() => {
     Promise.all([
       fetch('/api/pets/list').then(res => res.json()),
-      fetch('/api/services').then(res => res.json())
-    ]).then(([petsData, servicesData]) => {
+      fetch('/api/services').then(res => res.json()),
+      fetch('/api/vets/list').then(res => res.json())
+    ]).then(([petsData, servicesData, vetsData]) => {
       setPets(petsData);
       setServices(servicesData);
+      setVets(vetsData);
       if (petsData.length > 0) setFormData(prev => ({ ...prev, petId: petsData[0].id }));
       if (servicesData.length > 0) setFormData(prev => ({ ...prev, serviceId: servicesData[0].id }));
+      if (vetsData.length > 0) setFormData(prev => ({ ...prev, vetId: vetsData[0].id }));
     });
   }, []);
 
@@ -61,6 +66,13 @@ export default function BookAppointmentPage() {
           <label className="block text-sm font-medium text-slate-700 mb-2">Select Service</label>
           <select className="w-full px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-blue-500" value={formData.serviceId} onChange={e => setFormData({...formData, serviceId: e.target.value})} required>
             {services.map((svc: any) => <option key={svc.id} value={svc.id}>{svc.name} (${svc.price})</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">Select Veterinarian</label>
+          <select className="w-full px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-blue-500" value={formData.vetId} onChange={e => setFormData({...formData, vetId: e.target.value})} required>
+            {vets.length === 0 && <option value="" disabled>No veterinarians available</option>}
+            {vets.map((vet: any) => <option key={vet.id} value={vet.id}>{vet.name} ({vet.specialty})</option>)}
           </select>
         </div>
         <div>
