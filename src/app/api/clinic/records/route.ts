@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/firebase-admin';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -11,13 +11,12 @@ export async function POST(req: Request) {
 
   try {
     const data = await req.json();
-    const record = await prisma.medicalRecord.create({
-      data: {
-        ...data,
-        vetId: session.user.id,
-      },
+    const recordRef = await db.collection('medical_records').add({
+      ...data,
+      vetId: session.user.id,
+      createdAt: new Date().toISOString(),
     });
-    return NextResponse.json(record, { status: 201 });
+    return NextResponse.json({ id: recordRef.id, ...data }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to create record' }, { status: 500 });
   }

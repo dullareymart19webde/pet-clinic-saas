@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/firebase-admin';
 
 export async function GET() {
-  const services = await prisma.service.findMany({ orderBy: { name: 'asc' } });
+  const snapshot = await db.collection('services').orderBy('name', 'asc').get();
+  const services = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   return NextResponse.json(services);
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/firebase-admin';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -9,17 +9,16 @@ export async function POST(req: Request) {
 
   try {
     const data = await req.json();
-    const apt = await prisma.appointment.create({
-      data: {
-        petId: data.petId,
-        serviceId: data.serviceId,
-        dateTime: data.dateTime,
-        notes: data.notes,
-        userId: session.user.id,
-        status: 'PENDING'
-      }
+    const aptRef = await db.collection('appointments').add({
+      petId: data.petId,
+      serviceId: data.serviceId,
+      dateTime: data.dateTime,
+      notes: data.notes,
+      userId: session.user.id,
+      status: 'PENDING',
+      createdAt: new Date().toISOString(),
     });
-    return NextResponse.json(apt, { status: 201 });
+    return NextResponse.json({ id: aptRef.id, ...data, userId: session.user.id, status: 'PENDING' }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to book' }, { status: 500 });
   }

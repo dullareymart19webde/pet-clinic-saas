@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/firebase-admin';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -7,6 +7,7 @@ export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const pets = await prisma.pet.findMany({ where: { ownerId: session.user.id } });
+  const snapshot = await db.collection('pets').where('ownerId', '==', session.user.id).get();
+  const pets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   return NextResponse.json(pets);
 }

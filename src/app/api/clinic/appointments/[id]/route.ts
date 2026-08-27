@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/firebase-admin';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -13,11 +13,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   try {
     const { status } = await req.json();
-    const updated = await prisma.appointment.update({
-      where: { id },
-      data: { status }
-    });
-    return NextResponse.json(updated);
+    await db.collection('appointments').doc(id).update({ status });
+    return NextResponse.json({ id, status });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update appointment' }, { status: 500 });
   }

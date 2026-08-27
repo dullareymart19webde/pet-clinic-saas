@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/firebase-admin';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -9,13 +9,13 @@ export async function POST(req: Request) {
 
   try {
     const data = await req.json();
-    const pet = await prisma.pet.create({
-      data: {
-        ...data,
-        ownerId: session.user.id,
-      },
+    const petRef = await db.collection('pets').add({
+      ...data,
+      ownerId: session.user.id,
+      createdAt: new Date().toISOString(),
     });
-    return NextResponse.json(pet, { status: 201 });
+    
+    return NextResponse.json({ id: petRef.id, ...data }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to create pet' }, { status: 500 });
   }

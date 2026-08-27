@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcryptjs';
+import { auth, db } from '@/lib/firebase-admin';
 
 export async function POST(req: Request) {
   try {
@@ -13,49 +12,41 @@ export async function POST(req: Request) {
       );
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
-      return NextResponse.json(
-        { message: 'User already exists' },
-        { status: 409 }
-      );
-    }
-
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    const user = await prisma.user.create({
-      data: {
+    try {
+      // Create user in Firebase Auth
+      const userRecord = await auth.createUser({
         email,
-        passwordHash,
+        password,
+        displayName: `${firstName} ${lastName}`,
+      });
+
+      // Save additional user info in Firestore
+      await db.collection('users').doc(userRecord.uid).set({
+        email,
         firstName,
         lastName,
         role: role || 'PET_OWNER',
-      },
-    });
+        createdAt: new Date().toISOString(),
+      });
 
-    return NextResponse.json(
-      { message: 'User created successfully', user: { id: user.id, email: user.email } },
-      { status: 201 }
-    );
+      return NextResponse.json(
+        { message: 'User created successfully', user: { id: userRecord.uid, email: userRecord.email } },
+        { status: 201 }
+      );
+    } catch (authError: any) {
+      if (authError.code === 'auth/email-already-exists') {
+        return NextResponse.json(
+          { message: 'User already exists' },
+          { status: 409 }
+        );
+      }
+      throw authError;
+    }
   } catch (error: any) {
-    const dbUrl = process.env.DATABASE_URL || '';
-    const dbDebug = {
-      length: dbUrl.length,
-      startsWithPostgres: dbUrl.startsWith('postgresql://'),
-      hasOwner: dbUrl.includes('neondb_owner'),
-      hasPooler: dbUrl.includes('-pooler'),
-      hasQuotes: dbUrl.includes('"') || dbUrl.includes("'"),
-      hasSpaces: dbUrl.includes(' '),
-    };
-    
     console.error("Registration error:", error);
     return NextResponse.json(
       { 
-        message: String(error),
-        debug: dbDebug
+        message: String(error)
       },
       { status: 500 }
     );

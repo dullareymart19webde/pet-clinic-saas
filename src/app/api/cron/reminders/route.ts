@@ -1,24 +1,36 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/firebase-admin';
 
 export async function GET() {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const upcomingAppointments = await prisma.appointment.findMany({
-    where: {
-      dateTime: {
-        gte: new Date(),
-        lte: tomorrow,
-      },
-      status: 'APPROVED'
-    },
-    include: { pet: { include: { owner: true } } }
-  });
+  const snapshot = await db.collection('appointments')
+    .where('status', '==', 'APPROVED')
+    .where('dateTime', '>=', new Date().toISOString())
+    .where('dateTime', '<=', tomorrow.toISOString())
+    .get();
 
-  const notificationsSent = upcomingAppointments.map(apt => {
-    return `[MOCK] Email sent to ${apt.pet.owner.email}: Reminder for ${apt.pet.name}'s appointment on ${new Date(apt.dateTime).toLocaleString()}`;
-  });
+  const notificationsSent = [];
+  
+  for (const doc of snapshot.docs) {
+    const apt = doc.data();
+    
+    // Fetch pet
+    const petDoc = await db.collection('pets').doc(apt.petId).get();
+    if (petDoc.exists) {
+      const pet = petDoc.data();
+      
+      // Fetch owner
+      if (pet?.ownerId) {
+        const ownerDoc = await db.collection('users').doc(pet.ownerId).get();
+        if (ownerDoc.exists) {
+          const owner = ownerDoc.data();
+          notificationsSent.push(`[MOCK] Email sent to ${owner?.email}: Reminder for ${pet?.name}'s appointment on ${new Date(apt.dateTime).toLocaleString()}`);
+        }
+      }
+    }
+  }
 
   return NextResponse.json({
     message: 'Reminders processed successfully',

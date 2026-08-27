@@ -1,7 +1,6 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { prisma } from './prisma';
-import bcrypt from 'bcryptjs';
+import { auth, db } from './firebase-admin';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -16,29 +15,54 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
+        try {
+          // 1. Verify password with Firebase Auth REST API
+          const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+          const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+              returnSecureToken: true,
+            }),
+          });
 
-        if (!user) {
+          const data = await res.json();
+          if (!res.ok) {
+            console.error('Firebase Auth error:', data.error);
+            return null;
+          }
+
+          // 2. Fetch additional user data from Firestore (if exists)
+          const uid = data.localId;
+          const userRecord = await auth.getUser(uid);
+          
+          let role = 'ADMIN';
+          let name = userRecord.displayName || 'Admin';
+
+          // Try to get more details from Firestore if we have a users collection
+          try {
+            const userDoc = await db.collection('users').doc(uid).get();
+            if (userDoc.exists) {
+              const userData = userDoc.data();
+              if (userData?.role) role = userData.role;
+              if (userData?.firstName && userData?.lastName) name = `${userData.firstName} ${userData.lastName}`;
+            }
+          } catch (dbErr) {
+            console.error('Error fetching user from Firestore:', dbErr);
+          }
+
+          return {
+            id: uid,
+            email: data.email,
+            name,
+            role: role as any,
+          };
+        } catch (error) {
+          console.error('Error during authorization:', error);
           return null;
         }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.passwordHash
-        );
-
-        if (!isPasswordValid) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: `${user.firstName} ${user.lastName}`,
-          role: user.role,
-        };
       },
     }),
   ],
