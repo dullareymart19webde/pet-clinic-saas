@@ -13,7 +13,36 @@ export default async function MedicalRecordsPage() {
   }
 
   const recordsSnapshot = await db.collection('medicalRecords').orderBy('createdAt', 'desc').get();
-  const records = recordsSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+  const rawRecords = recordsSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+  
+  const records = await Promise.all(
+    rawRecords.map(async (rec) => {
+      let pet = { name: 'Unknown Pet', owner: { firstName: 'Unknown', lastName: 'Client' } };
+      let vet = { lastName: 'Unknown' };
+      
+      if (rec.petId) {
+        const petDoc = await db.collection('pets').doc(rec.petId).get();
+        if (petDoc.exists) {
+          const petData = petDoc.data() as any;
+          pet = { ...pet, ...petData };
+          
+          if (petData.ownerId) {
+            const ownerDoc = await db.collection('users').doc(petData.ownerId).get();
+            if (ownerDoc.exists) {
+              pet.owner = { ...pet.owner, ...(ownerDoc.data() as any) };
+            }
+          }
+        }
+      }
+      
+      if (rec.vetId) {
+        const vetDoc = await db.collection('users').doc(rec.vetId).get();
+        if (vetDoc.exists) vet = { ...vet, ...(vetDoc.data() as any) };
+      }
+      
+      return { ...rec, pet, vet };
+    })
+  );
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">

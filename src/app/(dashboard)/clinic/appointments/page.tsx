@@ -12,7 +12,29 @@ export default async function ClinicAppointmentsPage() {
   }
 
   const aptsSnapshot = await db.collection('appointments').orderBy('dateTime', 'asc').get();
-  const appointments = aptsSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+  
+  const rawAppointments = aptsSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+  const appointments = await Promise.all(
+    rawAppointments.map(async (apt) => {
+      let pet = { name: 'Unknown Pet' };
+      let service = { name: 'Unknown Service' };
+      let user = { firstName: 'Unknown', lastName: 'User' };
+      
+      if (apt.petId) {
+        const petDoc = await db.collection('pets').doc(apt.petId).get();
+        if (petDoc.exists) pet = { ...pet, ...(petDoc.data() as any) };
+      }
+      if (apt.serviceId) {
+        const serviceDoc = await db.collection('services').doc(apt.serviceId).get();
+        if (serviceDoc.exists) service = { ...service, ...(serviceDoc.data() as any) };
+      }
+      if (apt.userId) {
+        const userDoc = await db.collection('users').doc(apt.userId).get();
+        if (userDoc.exists) user = { ...user, ...(userDoc.data() as any) };
+      }
+      return { ...apt, pet, service, user };
+    })
+  );
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">

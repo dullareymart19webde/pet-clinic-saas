@@ -10,8 +10,39 @@ export default async function BillingPage() {
     redirect('/dashboard');
   }
 
-  const billableSnapshot = await db.collection('appointments').where('status', 'in', ['COMPLETED', 'APPROVED']).orderBy('dateTime', 'desc').get();
-  const billableAppointments = billableSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+  const billableSnapshot = await db.collection('appointments').where('status', 'in', ['COMPLETED', 'APPROVED']).get();
+  const rawAppointments = billableSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+  
+  const billableAppointments = await Promise.all(
+    rawAppointments
+      .sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime())
+      .map(async (apt) => {
+        let pet = { name: 'Unknown Pet', owner: { firstName: 'Unknown', lastName: 'Client' } };
+        let service = { name: 'Unknown Service', price: 0 };
+        
+        if (apt.petId) {
+          const petDoc = await db.collection('pets').doc(apt.petId).get();
+          if (petDoc.exists) {
+            const petData = petDoc.data() as any;
+            pet = { ...pet, ...petData };
+            
+            if (petData.ownerId) {
+              const ownerDoc = await db.collection('users').doc(petData.ownerId).get();
+              if (ownerDoc.exists) {
+                pet.owner = { ...pet.owner, ...(ownerDoc.data() as any) };
+              }
+            }
+          }
+        }
+        
+        if (apt.serviceId) {
+          const serviceDoc = await db.collection('services').doc(apt.serviceId).get();
+          if (serviceDoc.exists) service = { ...service, ...(serviceDoc.data() as any) };
+        }
+        
+        return { ...apt, pet, service };
+      })
+  );
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">

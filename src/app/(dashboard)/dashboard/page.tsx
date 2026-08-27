@@ -10,8 +10,32 @@ export default async function DashboardPage() {
   const petsSnapshot = await db.collection('pets').where('ownerId', '==', session?.user.id || '').get();
   const pets = petsSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
 
-  const appointmentsSnapshot = await db.collection('appointments').where('userId', '==', session?.user.id || '').orderBy('dateTime', 'asc').limit(5).get();
-  const appointments = appointmentsSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) })).filter((a: any) => a.status !== 'COMPLETED');
+  const appointmentsSnapshot = await db.collection('appointments').where('userId', '==', session?.user.id || '').get();
+  
+  // Sort manually to avoid requiring a composite index right away, and fetch relations
+  const rawAppointments = appointmentsSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) }));
+  const appointments = await Promise.all(
+    rawAppointments
+      .filter((a: any) => a.status !== 'COMPLETED')
+      .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())
+      .slice(0, 5)
+      .map(async (apt) => {
+        let pet = { name: 'Unknown Pet' };
+        let service = { name: 'Unknown Service' };
+        
+        if (apt.petId) {
+          const petDoc = await db.collection('pets').doc(apt.petId).get();
+          if (petDoc.exists) pet = { ...pet, ...(petDoc.data() as any) };
+        }
+        
+        if (apt.serviceId) {
+          const serviceDoc = await db.collection('services').doc(apt.serviceId).get();
+          if (serviceDoc.exists) service = { ...service, ...(serviceDoc.data() as any) };
+        }
+        
+        return { ...apt, pet, service };
+      })
+  );
 
   return (
     <div className="space-y-8">
