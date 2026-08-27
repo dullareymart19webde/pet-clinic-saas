@@ -1,19 +1,8 @@
 import { NextResponse } from 'next/server';
+import { auth, db } from '@/lib/firebase-admin';
 
 export async function POST(req: Request) {
   try {
-    let auth, db;
-    try {
-      const admin = await import('@/lib/firebase-admin');
-      auth = admin.auth;
-      db = admin.db;
-    } catch (importError: any) {
-      return NextResponse.json(
-        { message: 'Firebase Import Error: ' + (importError?.message || String(importError)) },
-        { status: 400 }
-      );
-    }
-
     const { email, password, firstName, lastName, role } = await req.json();
 
     if (!email || !password || !firstName || !lastName) {
