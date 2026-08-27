@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/firebase-admin';
 import { redirect } from 'next/navigation';
 import AppointmentList from '@/components/clinic/AppointmentList';
 
@@ -11,10 +11,8 @@ export default async function ClinicAppointmentsPage() {
     redirect('/dashboard');
   }
 
-  const appointments = await prisma.appointment.findMany({
-    include: { pet: true, service: true, user: true },
-    orderBy: { dateTime: 'asc' },
-  });
+  const aptsSnapshot = await db.collection('appointments').orderBy('dateTime', 'asc').get();
+  const appointments = aptsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">

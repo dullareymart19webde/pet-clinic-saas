@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/firebase-admin';
 import { redirect } from 'next/navigation';
 
 export default async function BillingPage() {
@@ -10,11 +10,8 @@ export default async function BillingPage() {
     redirect('/dashboard');
   }
 
-  const billableAppointments = await prisma.appointment.findMany({
-    where: { status: { in: ['COMPLETED', 'APPROVED'] } },
-    include: { pet: { include: { owner: true } }, service: true },
-    orderBy: { dateTime: 'desc' }
-  });
+  const billableSnapshot = await db.collection('appointments').where('status', 'in', ['COMPLETED', 'APPROVED']).orderBy('dateTime', 'desc').get();
+  const billableAppointments = billableSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">

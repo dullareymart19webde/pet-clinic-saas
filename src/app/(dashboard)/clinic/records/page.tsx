@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/firebase-admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
@@ -12,10 +12,8 @@ export default async function MedicalRecordsPage() {
     redirect('/dashboard');
   }
 
-  const records = await prisma.medicalRecord.findMany({
-    include: { pet: { include: { owner: true } }, vet: true },
-    orderBy: { createdAt: 'desc' },
-  });
+  const recordsSnapshot = await db.collection('medicalRecords').orderBy('createdAt', 'desc').get();
+  const records = recordsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">

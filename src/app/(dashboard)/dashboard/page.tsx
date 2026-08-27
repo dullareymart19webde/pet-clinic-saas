@@ -1,22 +1,17 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/firebase-admin';
 import Link from 'next/link';
 import { Calendar, Plus } from 'lucide-react';
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
-  const pets = await prisma.pet.findMany({
-    where: { ownerId: session?.user.id },
-  });
+  const petsSnapshot = await db.collection('pets').where('ownerId', '==', session?.user.id || '').get();
+  const pets = petsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-  const appointments = await prisma.appointment.findMany({
-    where: { userId: session?.user.id, status: { not: 'COMPLETED' } },
-    include: { pet: true, service: true },
-    orderBy: { dateTime: 'asc' },
-    take: 5,
-  });
+  const appointmentsSnapshot = await db.collection('appointments').where('userId', '==', session?.user.id || '').orderBy('dateTime', 'asc').limit(5).get();
+  const appointments = appointmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((a: any) => a.status !== 'COMPLETED');
 
   return (
     <div className="space-y-8">

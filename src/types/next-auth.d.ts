@@ -1,4 +1,5 @@
-import { Role } from '@prisma/client';
+import { DefaultSession } from 'next-auth';
+type Role = 'ADMIN' | 'VET' | 'STAFF' | 'PET_OWNER';
 
 declare module 'next-auth' {
   interface Session {
