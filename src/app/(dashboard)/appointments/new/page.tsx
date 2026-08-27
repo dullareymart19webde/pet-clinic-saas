@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-
+import { toast } from 'sonner';
 export default function BookAppointmentPage() {
   const router = useRouter();
   const [pets, setPets] = useState([]);
@@ -44,9 +44,14 @@ export default function BookAppointmentPage() {
         })
       });
       if (res.ok) {
+        toast.success("Appointment booked successfully!");
         router.push('/dashboard');
         router.refresh();
+      } else {
+        toast.error("Failed to book appointment. Please try again.");
       }
+    } catch (error) {
+      toast.error("An unexpected error occurred.");
     } finally {
       setLoading(false);
     }

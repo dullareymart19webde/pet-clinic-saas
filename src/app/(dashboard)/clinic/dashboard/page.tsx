@@ -39,26 +39,38 @@ export default async function ClinicDashboardPage() {
     }
   });
 
-  // Mock data for charts
-  const revenueData = [
-    { name: 'Mon', revenue: 66000 },
-    { name: 'Tue', revenue: 104500 },
-    { name: 'Wed', revenue: 82500 },
-    { name: 'Thu', revenue: 121000 },
-    { name: 'Fri', revenue: 154000 },
-    { name: 'Sat', revenue: 187000 },
-    { name: 'Sun', revenue: 115500 },
-  ];
+  // 3. Real Data for Charts (Last 7 Days)
+  const last7Days = Array.from({length: 7}).map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    d.setHours(0,0,0,0);
+    return d;
+  });
 
-  const appointmentData = [
-    { name: 'Mon', appointments: 12 },
-    { name: 'Tue', appointments: 15 },
-    { name: 'Wed', appointments: 10 },
-    { name: 'Thu', appointments: 18 },
-    { name: 'Fri', appointments: 25 },
-    { name: 'Sat', appointments: 30 },
-    { name: 'Sun', appointments: 20 },
-  ];
+  const revenueData = last7Days.map(d => ({ name: d.toLocaleDateString('en-US', {weekday: 'short'}), revenue: 0 }));
+  const appointmentData = last7Days.map(d => ({ name: d.toLocaleDateString('en-US', {weekday: 'short'}), appointments: 0 }));
+
+  const servicesSnapshot = await db.collection('services').get();
+  const servicePrices: Record<string, number> = {};
+  servicesSnapshot.forEach(doc => {
+    servicePrices[doc.id] = doc.data().price || 0;
+  });
+
+  appointmentsSnapshot.forEach((doc: any) => {
+    const data = doc.data();
+    if (data.dateTime) {
+      const dt = new Date(data.dateTime);
+      dt.setHours(0,0,0,0);
+      
+      const dayIndex = last7Days.findIndex(d => d.getTime() === dt.getTime());
+      if (dayIndex !== -1) {
+        appointmentData[dayIndex].appointments++;
+        if (data.status === 'COMPLETED' || data.status === 'APPROVED') {
+          revenueData[dayIndex].revenue += servicePrices[data.serviceId] || 0;
+        }
+      }
+    }
+  });
 
   return (
     <div className="space-y-12 pb-12">
