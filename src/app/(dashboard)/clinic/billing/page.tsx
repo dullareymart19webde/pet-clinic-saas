@@ -74,7 +74,7 @@ export default async function BillingPage() {
                   <span className="text-sm text-slate-500">Pet: {apt.pet.name}</span>
                 </td>
                 <td className="py-4 px-4 text-slate-800">{apt.service.name}</td>
-                <td className="py-4 px-4 text-slate-800 font-medium">${apt.service.price.toFixed(2)}</td>
+                <td className="py-4 px-4 text-slate-800 font-medium">₱{apt.service.price.toFixed(2)}</td>
                 <td className="py-4 px-4">
                   <span className="px-3 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-700">
                     Unpaid

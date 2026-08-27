@@ -65,7 +65,7 @@ export default function BookAppointmentPage() {
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">Select Service</label>
           <select className="w-full px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-blue-500" value={formData.serviceId} onChange={e => setFormData({...formData, serviceId: e.target.value})} required>
-            {services.map((svc: any) => <option key={svc.id} value={svc.id}>{svc.name} (${svc.price})</option>)}
+            {services.map((svc: any) => <option key={svc.id} value={svc.id}>{svc.name} (₱{svc.price})</option>)}
           </select>
         </div>
         <div>

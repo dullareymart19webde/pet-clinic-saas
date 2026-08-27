@@ -41,13 +41,13 @@ export default async function ClinicDashboardPage() {
 
   // Mock data for charts
   const revenueData = [
-    { name: 'Mon', revenue: 1200 },
-    { name: 'Tue', revenue: 1900 },
-    { name: 'Wed', revenue: 1500 },
-    { name: 'Thu', revenue: 2200 },
-    { name: 'Fri', revenue: 2800 },
-    { name: 'Sat', revenue: 3400 },
-    { name: 'Sun', revenue: 2100 },
+    { name: 'Mon', revenue: 66000 },
+    { name: 'Tue', revenue: 104500 },
+    { name: 'Wed', revenue: 82500 },
+    { name: 'Thu', revenue: 121000 },
+    { name: 'Fri', revenue: 154000 },
+    { name: 'Sat', revenue: 187000 },
+    { name: 'Sun', revenue: 115500 },
   ];
 
   const appointmentData = [
