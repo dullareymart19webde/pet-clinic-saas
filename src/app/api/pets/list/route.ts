@@ -8,6 +8,6 @@ export async function GET() {
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const snapshot = await db.collection('pets').where('ownerId', '==', session.user.id).get();
-  const pets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const pets = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }));
   return NextResponse.json(pets);
 }

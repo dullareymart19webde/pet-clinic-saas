@@ -9,7 +9,7 @@ export async function GET() {
       return NextResponse.json([]);
     }
 
-    const vets = vetsSnapshot.docs.map(doc => {
+    const vets = vetsSnapshot.docs.map((doc: any) => {
       const data = doc.data();
       return {
         id: doc.id,
