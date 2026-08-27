@@ -42,7 +42,7 @@ export default function RegisterPage() {
           throw new Error(data.message || JSON.stringify(data));
         } else {
           const text = await res.text();
-          throw new Error(`Server returned HTML error (Status: ${res.status}). The Firebase environment variables might be configured incorrectly in Vercel.`);
+          throw new Error(`Server returned HTML error (Status: ${res.status}). Raw response: ${text.substring(0, 300)}`);
         }
       }
 
