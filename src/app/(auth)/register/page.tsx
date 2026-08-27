@@ -36,8 +36,14 @@ export default function RegisterPage() {
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(JSON.stringify(data));
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const data = await res.json();
+          throw new Error(data.message || JSON.stringify(data));
+        } else {
+          const text = await res.text();
+          throw new Error(`Server returned HTML error (Status: ${res.status}). The Firebase environment variables might be configured incorrectly in Vercel.`);
+        }
       }
 
       // Automatically sign in the user after registration
