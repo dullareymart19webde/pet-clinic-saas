@@ -51,7 +51,16 @@ export default function RegisterPage() {
         throw new Error(signInRes.error);
       }
 
-      router.push('/dashboard');
+      // Get the session to check role
+      const sessionResponse = await fetch('/api/auth/session');
+      const session = await sessionResponse.json();
+      
+      if (session?.user?.role === 'VET' || session?.user?.role === 'ADMIN') {
+        router.push('/clinic/dashboard');
+      } else {
+        router.push('/dashboard');
+      }
+      router.refresh();
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Something went wrong');
