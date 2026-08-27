@@ -18,6 +18,10 @@ export const authOptions: NextAuthOptions = {
         try {
           // 1. Verify password with Firebase Auth REST API
           const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+          if (!apiKey) {
+            console.error('CRITICAL ERROR: NEXT_PUBLIC_FIREBASE_API_KEY is missing in environment variables. NextAuth cannot verify the user password.');
+            throw new Error('Missing NEXT_PUBLIC_FIREBASE_API_KEY');
+          }
           const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
