@@ -1,8 +1,19 @@
 import { NextResponse } from 'next/server';
-import { auth, db } from '@/lib/firebase-admin';
 
 export async function POST(req: Request) {
   try {
+    let auth, db;
+    try {
+      const admin = await import('@/lib/firebase-admin');
+      auth = admin.auth;
+      db = admin.db;
+    } catch (importError: any) {
+      return NextResponse.json(
+        { message: 'Firebase Import Error: ' + (importError?.message || String(importError)) },
+        { status: 400 }
+      );
+    }
+
     const { email, password, firstName, lastName, role } = await req.json();
 
     if (!email || !password || !firstName || !lastName) {
@@ -17,7 +28,7 @@ export async function POST(req: Request) {
       const userRecord = await auth.createUser({
         email,
         password,
-        displayName: `${firstName} ${lastName}`,
+        displayName: \ \,
       });
 
       // Save additional user info in Firestore
@@ -40,13 +51,16 @@ export async function POST(req: Request) {
           { status: 409 }
         );
       }
-      throw authError;
+      return NextResponse.json(
+        { message: 'Firebase Auth/DB Error: ' + (authError?.message || String(authError)) },
+        { status: 400 }
+      );
     }
   } catch (error: any) {
     console.error("Registration error:", error);
     return NextResponse.json(
       { 
-        message: error?.message || String(error)
+        message: 'Outer Error: ' + (error?.message || String(error))
       },
       { status: 400 }
     );
